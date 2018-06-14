@@ -1,8 +1,8 @@
 # ESP Server
 ## Requirement
-ESP32 : 1
-M5Stack : 1
-Raspberry Pi : 1
+ESP32 : 1  
+M5Stack : 1  
+Raspberry Pi : 1  
 
 ## PIN
 | PIN No. | Material |
@@ -25,11 +25,11 @@ c = 'R' : "Recovering"
 
 # Transmitter watch
 ## Requirement
-M5Stack : 1
-IR LED : 1
-Switch : 1
-IR receiver(38kHz) : 1
-FSR sensor : 1
+M5Stack : 1  
+IR LED : 1  
+Switch : 1  
+IR receiver(38kHz) : 1  
+FSR sensor : 1  
 
 ## PIN
 | PIN No. | Material |
@@ -41,15 +41,15 @@ FSR sensor : 1
 
 ## Parameter
 ### switchOut
-Output from switch.
+Output from switch.  
 Initial value is 0.
 
 ### last_switchOut:
-Last time output from switch.
+Last time output from switch.  
 Initial value is 0.
 
 ### shootCount:
-Number of shoot.
+Number of shoot.  
 Initial value is 0.
 
 ### lifeCount:
@@ -58,7 +58,7 @@ Initial value : 5
 When player get hitting, this value minus 1.
 
 ### recoverFlag:
-Flag of recovering.
-Initial value : 0
+Flag of recovering.  
+Initial value : 0  
 If recoverFlag = 0, player can recover 1 muscle. After use recover item, this flag = 1.  
 
