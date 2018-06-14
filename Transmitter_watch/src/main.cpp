@@ -210,7 +210,7 @@ void setup() {
   M5.Lcd.print(host);
   // This will comprobe if Stack is connected to the ESP-Server
   
-  /*
+
   if (!client_M5Stack.connect(host, port)) {
           M5.Lcd.setCursor(0, 100);
           M5.Lcd.print("connection failed");
@@ -219,7 +219,6 @@ void setup() {
           delay(2000);
           return;
   }
-  */
 
   /*Audio setup*/
   /*Please move music file(se_maoudamashii_battle_gun05.wav) into SD.
