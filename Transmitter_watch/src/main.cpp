@@ -61,9 +61,12 @@ void IR_Receptor() {
   if (irrecv.decode(&results)) {
     if (results.decode_type == SONY) {
       delay(1000);
-      M5.Lcd.setTextColor(WHITE);
+      M5.Lcd.setTextColor(BLACK);
       M5.Lcd.fillRect(20, 70+((5-lifeCount) * 25), 60, 20, BLACK); //Remove a life
+      M5.Lcd.setCursor(0, 0);
+      M5.Lcd.print(lifeCount);
       lifeCount--;
+      M5.Lcd.setTextColor(WHITE);
       // send one character H (Hit) every time the players was shooted
       client_M5Stack.print("HIT");
     }else if (results.decode_type == NEC){
