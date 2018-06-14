@@ -22,11 +22,14 @@ https://github.com/me-no-dev/arduino-esp32fs-plugin
 int switch_PIN = 2; //SHOT switch
 int IR_receptorPin = 17;//Pin used to read IR values
 
+/*Game status*/
 int switchOut = 0;
 int last_switchOut = 0;
 int shootCount = 0;
-int lifeCount = 0;
-int heartCount = 0;
+int lifeCount = 5;
+int recoverFlag = 0; //If recoverFlag = 0, player can recover 1 muscle. After use recover item, this flag = 1.
+
+/*Other*/
 int i = 0;
 int j = 10;
 
@@ -57,17 +60,24 @@ int stack_ip;
 void IR_Receptor() {
   if (irrecv.decode(&results)) {
     if (results.decode_type == SONY) {
-      lifeCount++;
-      M5.Lcd.setCursor(0, 220);
-      M5.Lcd.print("HIT!!!");
       delay(1000);
-      M5.Lcd.setTextColor(BLACK);
-      M5.Lcd.setCursor(0, 220);
-      M5.Lcd.print("HIT!!!");
       M5.Lcd.setTextColor(WHITE);
-      M5.Lcd.fillRect(20, 30+(lifeCount * 35), 60, 25, BLACK); //Remove a life
+      M5.Lcd.fillRect(20, 70+((5-lifeCount) * 25), 60, 20, BLACK); //Remove a life
+      lifeCount--;
       // send one character H (Hit) every time the players was shooted
       client_M5Stack.print("HIT");
+    }else if (results.decode_type == NEC){
+      
+        /*Make recover sound*/
+        file_shoot->close();
+        file_shoot = new AudioFileSourceSD("/se_maoudamashii_magical25.wav");
+        wav->begin(file_shoot, out);
+        dacWrite(25, 0);
+        lifeCount++;
+        M5.Lcd.fillRect(20, 70+((5-lifeCount) * 25), 60, 20, RED);
+        recoverFlag = 1;
+        delay(500);
+      
     }
     irrecv.resume(); // Receive the next value
   }
@@ -97,7 +107,7 @@ void IR_Transmitter() {
       client_M5Stack.println("SHOT");
 
       if (shootCount % 5 == 0 ){
-        M5.Lcd.fillRect(130, 30+((shootCount / 5 - 1) * 35), 60, 25, BLACK); //Remove a life
+        M5.Lcd.fillRect(130, 70+((shootCount / 5 - 1) * 25), 60, 20, BLACK); //Remove a shot
       }
 
       //Delete the SHOOT!!!!
@@ -111,7 +121,7 @@ void IR_Transmitter() {
   last_switchOut = switchOut;
 }
 void Game_over(){
-  if(lifeCount > 4){
+  if(lifeCount == 0){
     M5.Lcd.fillScreen(BLUE);
     M5.Lcd.setTextFont(4);
     M5.Lcd.setTextColor(WHITE);
@@ -126,13 +136,13 @@ void watch_functions() {
   /*LCD setup*/
   M5.Lcd.setTextFont(4);
   M5.Lcd.setCursor(0, 0);
-  M5.Lcd.print("PLAYER 1");
+  M5.Lcd.print(lifeCount);
   M5.Lcd.setCursor(0, 30);
   M5.Lcd.print("IP :");
   M5.Lcd.setCursor(40, 30);
   M5.Lcd.print(host);
 
- M5.Lcd.drawRect(10,60,80,140,WHITE);
+  M5.Lcd.drawRect(10,60,80,140,WHITE);
   M5.Lcd.setCursor(25, 215);
   M5.Lcd.print("LIFE");
 
@@ -169,7 +179,7 @@ void setup() {
   Serial.begin(115200);
   M5.begin();
 
-  /*LCD setup*/
+  // /*LCD setup*/
   M5.Lcd.setTextFont(2);
   M5.Lcd.setTextColor(WHITE);
   M5.Lcd.setCursor(0, 0);
@@ -178,7 +188,7 @@ void setup() {
   // WiFi setup
   // We start by connecting to a WiFi network
   WiFiMulti.addAP("Human-A1-721-2G_EXT", "bsys12bsys34");
-  //Start the connection of the client and wait until connect to the lan
+  // Start the connection of the client and wait until connect to the lan
   while(WiFiMulti.run() != WL_CONNECTED) {
            M5.Lcd.setCursor(i, j);
            M5.Lcd.print(".");
@@ -188,7 +198,7 @@ void setup() {
   M5.Lcd.fillScreen(BLACK);
   M5.Lcd.setCursor(0, 25);
   M5.Lcd.print("WiFi connected");
-  //print the IP assigned to the device
+  // //print the IP assigned to the device
   M5.Lcd.setCursor(0, 40);
   M5.Lcd.print("IP address: ");
   M5.Lcd.setCursor(0, 55);
@@ -200,15 +210,17 @@ void setup() {
   M5.Lcd.print(host);
   // This will comprobe if Stack is connected to the ESP-Server
   
+  /*
   if (!client_M5Stack.connect(host, port)) {
-          M5.Lcd.setCursor(0, 60);
+          M5.Lcd.setCursor(0, 100);
           M5.Lcd.print("connection failed");
-          M5.Lcd.setCursor(0, 60);
+          M5.Lcd.setCursor(0, 115);
           M5.Lcd.print("wait 5 sec...");
           delay(2000);
           return;
   }
-  
+  */
+
   /*Audio setup*/
   /*Please move music file(se_maoudamashii_battle_gun05.wav) into SD.
   This file put on the music folder*/
@@ -248,6 +260,9 @@ void setup() {
   M5.Lcd.fillRect(240,120,60,20,YELLOW);
   M5.Lcd.fillRect(240,145,60,20,YELLOW);
   M5.Lcd.fillRect(240,170,60,20,YELLOW);
+
+  //At the begining, IR turn on. I don't know why. This code turn off the IR.
+  irsend.sendSony(0xa90, 12);
 }
 
 void loop() {
