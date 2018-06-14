@@ -15,13 +15,13 @@ Raspberry Pi : 1
 ## Parameter
 ### lifeCount:
 Number of payer life.  
-Initial value : 5
+Initial value : 5  
 When player get hitting, this value minus 1.
 
 ### c:
-The values are sent from M5Stack.
-c = 'H' : "Hitting"
-c = 'R' : "Recovering"
+The values are sent from M5Stack.  
+c = 'H' : "Hitting"  
+c = 'R' : "Recovering"  
 
 # Transmitter watch
 ## Requirement
